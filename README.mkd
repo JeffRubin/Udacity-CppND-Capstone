@@ -1,4 +1,4 @@
-#Project Description: ROS Node Simulated In Gazebo
+# Project Description: ROS Node Simulated In Gazebo
 
 The project simulates a skid-steer robot in Gazebo and provides 2 types of simulation functionality:
 
@@ -7,12 +7,12 @@ The project simulates a skid-steer robot in Gazebo and provides 2 types of simul
 
 This project is based on the Udemy course: C++ Robotics Developer Course - Using ROS in C++ ([Using ROS in C++](https://www.udemy.com/course/c-plus-plus-robotics-developer-course-using-ros-in-c-plus-plus/))
 
-##src File Structure Overview
+## src File Structure Overview
 The code for this project is in the src directory (described further in the following sections)
 
 ![src File Structure](doc/fileStructureOverview.png)
 
-##What The Course Provided
+## What The Course Provided
 
 The main resources provided by the course were:
 
@@ -20,7 +20,7 @@ The main resources provided by the course were:
 - Gazebo skid-steer robot model and an associated blank world and launch file
 - OpenCV example code to view a ROS sensor_msgs/Image message
 
-##What The Course Did Not Provide (What I Completed For This Project)
+## What The Course Did Not Provide (What I Completed For This Project)
 I provided everything specified below.  If not specified below, it was provided by the course.
 
 - CMakeLists.txt: Used by catkin_make to build the project.  I added executables and linking for the ROS nodes that I created for the project.
