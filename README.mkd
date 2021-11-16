@@ -1,0 +1,150 @@
+#Project Description: ROS Node Simulated In Gazebo
+
+The project simulates a skid-steer robot in Gazebo and provides 2 types of simulation functionality:
+
+- Driving via the keyboard: Drive ROS node which uses the custom Drive class which implements ROS publishing to command robot motion.  This functionality is meant to demonstrate object-oriented concepts (and thus may not be the most ROS-way of doing things).
+- Camera operation and image viewing: Operate Camera Client/Server ROS nodes which implement a ROS service to command camera motion (via ROS publishing) and receive and display an image from the robot once the camera motion has taken place.  This functionality is meant to demonstrate understanding of ROS concepts (e.g. publishing, subscription, service) and is not organized into custom classes.
+
+This project is based on the Udemy course: C++ Robotics Developer Course - Using ROS in C++ ([Using ROS in C++](https://www.udemy.com/course/c-plus-plus-robotics-developer-course-using-ros-in-c-plus-plus/))
+
+##src File Structure Overview
+The code for this project is in the src directory (described further in the following sections)
+
+![src File Structure](doc/fileStructureOverview.png)
+
+##What The Course Provided
+
+The main resources provided by the course were:
+
+- Overview of ROS concepts
+- Gazebo skid-steer robot model and an associated blank world and launch file
+- OpenCV example code to view a ROS sensor_msgs/Image message
+
+##What The Course Did Not Provide (What I Completed For This Project)
+I provided everything specified below.  If not specified below, it was provided by the course.
+
+- CMakeLists.txt: Used by catkin_make to build the project.  I added executables and linking for the ROS nodes that I created for the project.
+- config/config.yaml: Configures the skid-steer robot for simulation.  I tuned and set the PID values for camera_shaft_joint_position_controller.
+- include/drive.h: Custom Drive class definition.  I created this from scratch.
+- launch/world.launch: Launches the Gazebo simulation.  I added the "Robot control nodes and configuration" section to launch the operate_camera_server_node and to set some ROS parameter server configurable parameters.
+- src/drive.cpp Custom Drive class implementation.  I created this from scratch.
+- src/drive_node.cpp, operate_camera_client_node.cpp, operate_camera_server_node.cpp: ROS nodes.  I created these from scratch.
+- srv/OperateCamera.srv: ROS service definiton.  I created this from scratch.
+- world/capstone.world: Gazebo world. I created this in the Gazebo GUI so there would be things to see from the robot camera.
+
+# Building And Running The Project
+## Environment
+- OS: Ubuntu 20.04
+    - Or a virtual machine running this but the Internet does not recommend this since it can be very slow
+    - ROS 1 only runs on Ubuntu
+- ROS 1 - Noetic
+    - http://wiki.ros.org/noetic/Installation/Ubuntu
+        - Desktop-Full Install (needed for Gazebo)
+- Additional ROS Packages Needed (commands to install):
+    - sudo apt install ros-noetic-joint-state-controller
+    - sudo apt install ros-noetic-velocity-controllers
+
+## Build
+- Open a terminal
+- cd to capstone_ws
+- catkin_make
+    - **If the build fails due to udemy_sim_pkg/OperateCamera.h: No such file or directory**: Run catkin_make again
+        - OperateCamera is a custom ROS service (described below)
+
+## Run
+### Gazebo
+- Open a terminal
+- cd to capstone_ws
+- source devel/setup.bash
+- roslaunch udemy_sim_pkg world.launch
+    - Gazebo will open.  There should be no errors at the command line when opening.  If there are errors due to a timeout of loading the world or robot, this is likely a resources problem on the computer (like on my computer which is pretty old and doesn't have a GPU).  In this case, recommend closing all terminals and resource-intensive applications and opening a new terminal and trying this step again.
+    - The initial view in Gazebo is an overview of the world.  Use the scroll on the mouse to zoom to the center where the skid-steer robot to control is:
+        - ![Robot Starting Configuration](doc/skidSteerRobotStratingConfig.png)
+            - In this starting configuration: green = forward, red = right (negative heading)
+
+### Operate Camera
+- Open a 2nd terminal
+- cd to capstone_ws
+- source devel/setup.bash
+- rosrun udemy_sim_pkg operate_camera_client_node
+- Enter an angle (in degrees) to turn the camera to at the prompt.   The camera will move to the specified angle (movement can be seen in Gazebo) and an image will open shortly thereafter to show the image at the specified angle, e.g.
+    - ![Camera Operation Example From Terminal](doc/cameraOperationCli.png)
+    - ![Example Camera Image](doc/cameraViewExample.png)
+- Close the image to continue entering new angles from the terminal at which to view the camera image
+    - There are items to view in the world at every 45 degrees (image below wrt robot starting configuration)
+        - ![World Overview](doc/gazeboWorldLayout.png)
+            - Sphere: 0 degrees
+            - Stop Sign: +45 degrees
+- Can exit the prompt for camera operation at any time by entering an angle outside the range of [-360,360], e.g. 1001.
+
+### Drive
+- Open a 3rd terminal
+- cd to capstone_ws
+- source devel/setup.bash
+- rosrun udemy_sim_pkg drive_node
+- Enter a drive command at the prompt
+    - ![Drive Operation Example From Terminal](doc/driveOperationCli.png)
+    - Can adjust speed (+/-) while in motion or while stopped
+    - View any resulting robot motion in Gazebo
+        - Can always Edit --> Reset World in Gazebo if the robot goes too far to bring it back to the starting configuration
+    - Skid-steer drive system has difficulty with friction and slipping when turning so recommend a speed of at least 15 (normalized units) for turning; any speed works for forwards and backwards translation
+- Can exit the prompt for driving at any time by entering 'q'
+
+### Cleanup
+To finish up operation:
+
+- Exit the camera operation and driving terminals by using the exit actions in the CLIs for these (e.g. 'q' for drive)
+- Close Gazebo
+- Ctrl+C in the termainal where called roslaunch udemy_sim_pkg world.launch (which launched Gazebo)
+    - Takes a few seconds to finish up
+
+# Udacity C++ Capstone Project Rubric
+
+## Loops, Functions, I/O
+
+### The project demonstrates an understanding of C++ functions and control structures.
+- drive_node.cpp
+    - while loop: Starts line 23
+    - if/else-if/else: Lines 28-41
+    - switch: Starts line 43
+- drive.cpp
+    - switch: Starts line 22
+- operate_camera_server_node.cpp
+    - cameraImageCallback function: Lines 10-13
+    - getImage function: Starts line 15
+- drive.h
+    - Organized into member functions: Lines 12-21 (prototypes)
+
+### The project accepts user input and processes the input.
+- drive_node.cpp: Lines 25-26 (processing of the input after that)
+- operate_camera_client_node: Lines 29-30 (processing of the input after that)
+
+## Object Oriented Programming
+
+### The project uses Object Oriented Programming techniques.
+- drive.h/drive.cpp: Entirety
+- operate_camera_server_node: Use of ROS classes: Lines 52-58
+- operate_camera_client_node: Use of OpenCV classes: Lines 44-48
+
+### Classes use appropriate access specifiers for class members.
+- drive.h: Lines 12, 19
+
+### Class constructors utilize member initialization lists.
+- drive.cpp: Line 10
+
+### Classes abstract implementation details from their interfaces.
+- drive.h: Lines 14-17, 20
+    - All motion function implementations are abstracted from the interface, especially move(MoveDirection direction) which handles converting a motion direction to speed commands.  In addition, function names clearly specify what the functions do.
+
+### Classes encapsulate behavior.
+- drive.h/drive.cpp: Entirety
+    - Drive functions are grouped into this class.  Public member functions, e.g. move(MoveDirection direction), stop() are available for use on instances of the class while private member functions and data are hidden from the user (who has no need to access these).
+
+## Memory Management
+### The project makes use of references in function declarations.
+- drive.h: Line: 13
+- operate_camera_server_node.cpp: Lines: 10, 15-16
+
+### The project uses smart pointers instead of raw pointers.
+- operate_camera_server_node.cpp: Lines 33-38 (boost library shared pointer is returned by ros::topic::waitForMessage)
+    - The code uses raw pointers in places but in this place where the resource is an image (and would therefore be especially damaging to leak) a smart pointer is used.
